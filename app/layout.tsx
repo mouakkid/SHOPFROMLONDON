@@ -7,7 +7,7 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "SHOP FROM LONDON - Orders",
-  description: "Simple orders manager with Supabase",
+  description: "Orders manager with Supabase",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -16,13 +16,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className={inter.className}>
         <TopBar />
         <main className="mx-auto max-w-6xl px-4 py-6 relative">
-          {/* halo doux derrière le contenu */}
           <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(600px_160px_at_50%_-20px,rgba(167,139,250,0.12),transparent_60%)]" />
           {children}
         </main>
-        <footer className="border-t py-6 text-center text-sm text-gray-500">
-          Built with Next.js + Supabase
-        </footer>
       </body>
     </html>
   );
