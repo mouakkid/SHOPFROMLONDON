@@ -4,7 +4,12 @@ import { useEffect, useMemo, useState } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import type { Order } from '@/types';
 import { monthKey } from '@/lib/utils';
-import { Area, AreaChart, Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
+import {
+  Area, AreaChart, Bar, BarChart, CartesianGrid,
+  ResponsiveContainer, Tooltip, XAxis, YAxis, PieChart, Pie, Cell, Legend
+} from 'recharts';
+
+const PALETTE = ['#8B5CF6','#6366F1','#3B82F6','#22D3EE','#10B981','#F59E0B','#EF4444','#EC4899','#14B8A6','#84CC16','#F43F5E','#06B6D4'];
 
 export default function DashboardPage() {
   const [items, setItems] = useState<Order[]>([]);
@@ -29,39 +34,81 @@ export default function DashboardPage() {
     return Object.values(map);
   }, [items]);
 
+  const donutData = useMemo(() => {
+    const total = monthly.reduce((a, b) => a + b.revenue, 0);
+    return monthly.map((m) => ({
+      name: m.month,
+      value: Number(m.revenue.toFixed(2)),
+      percent: total ? (m.revenue / total) * 100 : 0
+    }));
+  }, [monthly]);
+
   return (
     <div className="grid gap-6 md:grid-cols-2">
-      <div className="card">
+      {/* Gradient Area: Revenue per month */}
+      <div className="card overflow-hidden">
         <h3 className="mb-2 text-lg font-semibold">Chiffre d'affaires par mois</h3>
-        <div style={{ width: '100%', height: 300 }}>
+        <div style={{ width: '100%', height: 320 }}>
           <ResponsiveContainer>
             <AreaChart data={monthly}>
               <defs>
-                <linearGradient id="g1" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#111827" stopOpacity={0.8}/>
-                  <stop offset="95%" stopColor="#111827" stopOpacity={0}/>
+                <linearGradient id="revFill" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#8B5CF6" stopOpacity={0.85}/>
+                  <stop offset="95%" stopColor="#8B5CF6" stopOpacity={0}/>
                 </linearGradient>
               </defs>
               <XAxis dataKey="month" />
               <YAxis />
-              <CartesianGrid strokeDasharray="3 3" />
-              <Tooltip />
-              <Area type="monotone" dataKey="revenue" stroke="#111827" fillOpacity={1} fill="url(#g1)" />
+              <CartesianGrid strokeDasharray="4 4" />
+              <Tooltip formatter={(v: number) => v.toLocaleString(undefined, { style: 'currency', currency: 'MAD' })} />
+              <Area type="monotone" dataKey="revenue" stroke="#7C3AED" strokeWidth={2} fillOpacity={1} fill="url(#revFill)" />
             </AreaChart>
           </ResponsiveContainer>
         </div>
       </div>
 
-      <div className="card">
+      {/* Donut: revenue share */}
+      <div className="card overflow-hidden">
+        <h3 className="mb-2 text-lg font-semibold">Répartition du CA (donut)</h3>
+        <div style={{ width: '100%', height: 320 }}>
+          <ResponsiveContainer>
+            <PieChart>
+              <Pie
+                data={donutData}
+                dataKey="value"
+                nameKey="name"
+                innerRadius={70}
+                outerRadius={110}
+                paddingAngle={3}
+                stroke="#fff"
+                strokeWidth={2}
+              >
+                {donutData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={PALETTE[index % PALETTE.length]} />
+                ))}
+              </Pie>
+              <Tooltip formatter={(v: number) => v.toLocaleString(undefined, { style: 'currency', currency: 'MAD' })} />
+              <Legend />
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+
+      {/* Bars: Orders per month with color ramp */}
+      <div className="card md:col-span-2 overflow-hidden">
         <h3 className="mb-2 text-lg font-semibold">Nombre de commandes par mois</h3>
-        <div style={{ width: '100%', height: 300 }}>
+        <div style={{ width: '100%', height: 320 }}>
           <ResponsiveContainer>
             <BarChart data={monthly}>
+              <CartesianGrid strokeDasharray="4 4" />
               <XAxis dataKey="month" />
               <YAxis />
-              <CartesianGrid strokeDasharray="3 3" />
               <Tooltip />
-              <Bar dataKey="orders" />
+              <Bar dataKey="orders">
+                {monthly.map((_, idx) => (
+                  <Cell key={idx} fill={PALETTE[idx % PALETTE.length]} />
+                ))}
+              </Bar>
             </BarChart>
           </ResponsiveContainer>
         </div>
