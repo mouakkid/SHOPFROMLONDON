@@ -23,16 +23,6 @@ export default function LoginPage() {
     else router.push('/dashboard');
   };
 
-  const signup = async (e: React.MouseEvent) => {
-    e.preventDefault();
-    setError(null);
-    setLoading(true);
-    const { error } = await supabase.auth.signUp({ email, password });
-    setLoading(false);
-    if (error) setError(error.message);
-    else router.push('/dashboard');
-  };
-
   return (
     <div className="mx-auto grid max-w-md gap-6">
       <motion.h1
@@ -49,14 +39,7 @@ export default function LoginPage() {
           <span className="text-sm font-medium">Email</span>
           <div className="flex items-center gap-2 rounded-xl border px-3">
             <Mail size={16} className="text-gray-500" />
-            <input
-              className="w-full bg-transparent py-2 outline-none"
-              type="email"
-              required
-              value={email}
-              onChange={e => setEmail(e.target.value)}
-              placeholder="you@example.com"
-            />
+            <input className="w-full bg-transparent py-2 outline-none" type="email" required value={email} onChange={e => setEmail(e.target.value)} placeholder="you@example.com"/>
           </div>
         </label>
 
@@ -64,26 +47,14 @@ export default function LoginPage() {
           <span className="text-sm font-medium">Password</span>
           <div className="flex items-center gap-2 rounded-xl border px-3">
             <KeyRound size={16} className="text-gray-500" />
-            <input
-              className="w-full bg-transparent py-2 outline-none"
-              type="password"
-              required
-              value={password}
-              onChange={e => setPassword(e.target.value)}
-              placeholder="••••••••"
-            />
+            <input className="w-full bg-transparent py-2 outline-none" type="password" required value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••"/>
           </div>
         </label>
 
         {error && <p className="text-sm text-red-600">{error}</p>}
 
-        <div className="flex items-center justify-between">
-          <button disabled={loading} className="btn btn-primary disabled:opacity-50">
-            {loading ? 'Loading...' : 'Login'}
-          </button>
-          <button onClick={signup} disabled={loading} className="btn btn-outline">
-            {loading ? '...' : 'Create account'}
-          </button>
+        <div className="flex items-center justify-end">
+          <button disabled={loading} className="btn btn-primary disabled:opacity-50">{loading ? 'Loading...' : 'Login'}</button>
         </div>
       </form>
     </div>
