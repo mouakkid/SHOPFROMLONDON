@@ -15,7 +15,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en">
       <body className={inter.className}>
         <TopBar />
-        <main className="mx-auto max-w-6xl px-4 py-6">
+        <main className="mx-auto max-w-6xl px-4 py-6 relative">
+          {/* halo doux derrière le contenu */}
+          <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(600px_160px_at_50%_-20px,rgba(167,139,250,0.12),transparent_60%)]" />
           {children}
         </main>
         <footer className="border-t py-6 text-center text-sm text-gray-500">
