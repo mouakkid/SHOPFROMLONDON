@@ -54,7 +54,7 @@ export default function LoginPage() {
         </label>
 
         <label className="grid gap-2">
-          <span className="text-sm font-medium">Password</span>
+          <span className="text-sm font-medium">Password</</span>
           <div className="flex items-center gap-2 rounded-xl border px-3">
             <KeyRound size={16} className="text-gray-500" />
             <input className="w-full bg-transparent py-2 outline-none" type="password" required value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••"/>
@@ -64,8 +64,8 @@ export default function LoginPage() {
         {error && <p className="text-sm text-red-600">{error}</p>}
 
         <div className="flex items-center justify-between">
-          <button disabled={loading} className="btn bg-gray-900 text-white disabled:opacity-50">{loading ? 'Loading...' : 'Login'}</button>
-          <button onClick={signup} disabled={loading} className="btn border">{loading ? '...' : 'Create account'}</button>
+          <button disabled={loading} className="btn btn-primary disabled:opacity-50">{loading ? 'Loading...' : 'Login'}</button>
+          <button onClick={signup} disabled={loading} className="btn btn-outline">{loading ? '...' : 'Create account'}</button>
         </div>
       </form>
     </div>
