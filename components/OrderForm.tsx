@@ -64,7 +64,7 @@ export default function OrderForm({ onCreated }: Props) {
 
       {error && <p className="text-sm text-red-600">{error}</p>}
 
-      <button disabled={loading} className="btn bg-gray-900 text-white disabled:opacity-50 animate-pulse-soft">
+      <button disabled={loading} className="btn btn-primary disabled:opacity-50 animate-pulse-soft">
         <Save size={16}/> {loading ? 'Enregistrement...' : 'Ajouter la commande'}
       </button>
     </motion.form>

@@ -87,8 +87,8 @@ export default function OrdersTable({ items, onChanged }: Props) {
         </div>
 
         <div className="flex items-center gap-2">
-          <button onClick={exportCSV} className="btn border" title="Exporter CSV"><Download size={16}/> CSV</button>
-          <button onClick={exportXLSX} className="btn border" title="Exporter Excel"><FileSpreadsheet size={16}/> XLSX</button>
+          <button onClick={exportCSV} className="btn btn-outline" title="Exporter CSV"><Download size={16}/> CSV</button>
+          <button onClick={exportXLSX} className="btn btn-outline" title="Exporter Excel"><FileSpreadsheet size={16}/> XLSX</button>
         </div>
       </div>
 
@@ -125,8 +125,8 @@ export default function OrdersTable({ items, onChanged }: Props) {
                 <td className="p-2">{new Date(o.created_at).toLocaleDateString()}</td>
                 <td className="p-2 text-right">
                   <div className="flex justify-end gap-2">
-                    <button className="btn border" onClick={() => setEditing(o)}><Edit size={16}/> Edit</button>
-                    <button className="btn border" onClick={() => onDelete(o.id)} disabled={busyId===o.id}>
+                    <button className="btn btn-outline" onClick={() => setEditing(o)}><Edit size={16}/> Edit</button>
+                    <button className="btn btn-outline" onClick={() => onDelete(o.id)} disabled={busyId===o.id}>
                       <Trash2 size={16}/> {busyId===o.id ? '...' : 'Supprimer'}
                     </button>
                   </div>
@@ -152,8 +152,8 @@ export default function OrdersTable({ items, onChanged }: Props) {
               <Field label="Montant Avance" value={String(editing.amount_deposit ?? '')} onChange={v => setEditing({ ...editing!, amount_deposit: v ? Number(v) : null })} type="number" />
             </div>
             <div className="mt-4 flex justify-end gap-2">
-              <button className="btn border" onClick={() => setEditing(null)}>Annuler</button>
-              <button className="btn bg-gray-900 text-white" onClick={onSave} disabled={busyId===editing.id}>Sauvegarder</button>
+              <button className="btn btn-outline" onClick={() => setEditing(null)}>Annuler</button>
+              <button className="btn btn-primary" onClick={onSave} disabled={busyId===editing.id}>Sauvegarder</button>
             </div>
           </div>
         </div>
