@@ -27,7 +27,9 @@ export default function OrdersTable({ items, onChanged }: Props) {
       (o.last_name ?? '').toLowerCase().includes(q) ||
       (o.phone ?? '').toLowerCase().includes(q) ||
       (o.address ?? '').toLowerCase().includes(q) ||
-      (o.instagram_url ?? '').toLowerCase().includes(q)
+      (o.instagram_url ?? '').toLowerCase().includes(q) ||
+      (o.product_name ?? '').toLowerCase().includes(q) ||
+      (o.comment ?? '').toLowerCase().includes(q)
     );
   }, [items, query]);
 
@@ -53,8 +55,8 @@ export default function OrdersTable({ items, onChanged }: Props) {
   };
 
   const exportCSV = () => {
-    const headers = ['order_no','first_name','last_name','address','phone','instagram_url','amount_purchase','amount_sale','amount_deposit','created_at'];
-    const rows = filtered.map(o => [o.order_no,o.first_name,o.last_name,o.address,o.phone,o.instagram_url,o.amount_purchase,o.amount_sale,o.amount_deposit,o.created_at]);
+    const headers = ['order_no','first_name','last_name','address','phone','instagram_url','product_name','comment','amount_purchase','amount_sale','amount_deposit','created_at'];
+    const rows = filtered.map(o => [o.order_no,o.first_name,o.last_name,o.address,o.phone,o.instagram_url,o.product_name,o.comment,o.amount_purchase,o.amount_sale,o.amount_deposit,o.created_at]);
     const csv = [headers.join(','), ...rows.map(r => r.map(v => (v ?? '')).join(','))].join('\n');
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
@@ -66,9 +68,9 @@ export default function OrdersTable({ items, onChanged }: Props) {
   const exportXLSX = async () => {
     const wb = new ExcelJS.Workbook();
     const ws = wb.addWorksheet('Orders');
-    ws.addRow(['Order #','First name','Last name','Address','Phone','Instagram','Amount purchase','Amount sale','Amount deposit','Created at']);
+    ws.addRow(['Order #','First name','Last name','Address','Phone','Instagram','Product','Comment','Amount purchase','Amount sale','Amount deposit','Created at']);
     filtered.forEach(o => {
-      ws.addRow([o.order_no,o.first_name,o.last_name,o.address,o.phone,o.instagram_url,o.amount_purchase,o.amount_sale,o.amount_deposit,o.created_at]);
+      ws.addRow([o.order_no,o.first_name,o.last_name,o.address,o.phone,o.instagram_url,o.product_name,o.comment,o.amount_purchase,o.amount_sale,o.amount_deposit,o.created_at]);
     });
     const buf = await wb.xlsx.writeBuffer();
     const blob = new Blob([buf], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
@@ -97,42 +99,52 @@ export default function OrdersTable({ items, onChanged }: Props) {
           <thead>
             <tr className="text-left text-gray-500">
               <th className="p-2">#</th>
+              <th className="p-2">Produit</th>
               <th className="p-2">Client</th>
               <th className="p-2">Téléphone</th>
               <th className="p-2">Montant Vente</th>
               <th className="p-2">Avance</th>
+              <th className="p-2">Reste</th>
               <th className="p-2">Créé</th>
               <th className="p-2"></th>
             </tr>
           </thead>
           <tbody>
-            {filtered.map((o, idx) => (
-              <motion.tr
-                key={o.id}
-                initial={{ opacity: 0, y: 6 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.2, delay: idx * 0.02 }}
-                className="border-t"
-              >
-                <td className="p-2 font-mono">{o.order_no}</td>
-                <td className="p-2">
-                  <div className="font-medium">{o.first_name} {o.last_name}</div>
-                  <div className="text-xs text-gray-500">{o.address}</div>
-                </td>
-                <td className="p-2">{o.phone}</td>
-                <td className="p-2">{currency(o.amount_sale ?? 0)}</td>
-                <td className="p-2">{currency(o.amount_deposit ?? 0)}</td>
-                <td className="p-2">{new Date(o.created_at).toLocaleDateString()}</td>
-                <td className="p-2 text-right">
-                  <div className="flex justify-end gap-2">
-                    <button className="btn btn-outline" onClick={() => setEditing(o)}><Edit size={16}/> Edit</button>
-                    <button className="btn btn-outline" onClick={() => onDelete(o.id)} disabled={busyId===o.id}>
-                      <Trash2 size={16}/> {busyId===o.id ? '...' : 'Supprimer'}
-                    </button>
-                  </div>
-                </td>
-              </motion.tr>
-            ))}
+            {filtered.map((o, idx) => {
+              const unpaid = Math.max(Number(o.amount_sale || 0) - Number(o.amount_deposit || 0), 0);
+              return (
+                <motion.tr
+                  key={o.id}
+                  initial={{ opacity: 0, y: 6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.2, delay: idx * 0.02 }}
+                  className="border-t"
+                >
+                  <td className="p-2 font-mono">{o.order_no}</td>
+                  <td className="p-2">
+                    <div className="font-medium">{o.product_name ?? '-'}</div>
+                    {o.comment ? <div className="text-xs text-gray-500 line-clamp-1">{o.comment}</div> : null}
+                  </td>
+                  <td className="p-2">
+                    <div className="font-medium">{o.first_name} {o.last_name}</div>
+                    <div className="text-xs text-gray-500">{o.address}</div>
+                  </td>
+                  <td className="p-2">{o.phone}</td>
+                  <td className="p-2">{currency(o.amount_sale ?? 0)}</td>
+                  <td className="p-2">{currency(o.amount_deposit ?? 0)}</td>
+                  <td className="p-2">{currency(unpaid)}</td>
+                  <td className="p-2">{new Date(o.created_at).toLocaleDateString()}</td>
+                  <td className="p-2 text-right">
+                    <div className="flex justify-end gap-2">
+                      <button className="btn btn-outline" onClick={() => setEditing(o)}><Edit size={16}/> Edit</button>
+                      <button className="btn btn-outline" onClick={() => onDelete(o.id)} disabled={busyId===o.id}>
+                        <Trash2 size={16}/> {busyId===o.id ? '...' : 'Supprimer'}
+                      </button>
+                    </div>
+                  </td>
+                </motion.tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
@@ -142,6 +154,7 @@ export default function OrdersTable({ items, onChanged }: Props) {
           <div className="card w-full max-w-xl">
             <h3 className="mb-3 text-lg font-semibold">Modifier commande {editing.order_no}</h3>
             <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+              <Field label="Nom du produit" value={editing.product_name ?? ''} onChange={v => setEditing({ ...editing!, product_name: v })} />
               <Field label="Prénom" value={editing.first_name} onChange={v => setEditing({ ...editing!, first_name: v })} />
               <Field label="Nom" value={editing.last_name} onChange={v => setEditing({ ...editing!, last_name: v })} />
               <Field label="Adresse" value={editing.address} onChange={v => setEditing({ ...editing!, address: v })} />
@@ -150,6 +163,7 @@ export default function OrdersTable({ items, onChanged }: Props) {
               <Field label="Montant Achat" value={String(editing.amount_purchase ?? '')} onChange={v => setEditing({ ...editing!, amount_purchase: v ? Number(v) : null })} type="number" />
               <Field label="Montant Vente" value={String(editing.amount_sale ?? '')} onChange={v => setEditing({ ...editing!, amount_sale: v ? Number(v) : null })} type="number" />
               <Field label="Montant Avance" value={String(editing.amount_deposit ?? '')} onChange={v => setEditing({ ...editing!, amount_deposit: v ? Number(v) : null })} type="number" />
+              <Textarea label="Commentaire" value={editing.comment ?? ''} onChange={v => setEditing({ ...editing!, comment: v })} />
             </div>
             <div className="mt-4 flex justify-end gap-2">
               <button className="btn btn-outline" onClick={() => setEditing(null)}>Annuler</button>
@@ -170,6 +184,17 @@ function Field({ label, value, onChange, type='text' } : { label: string, value:
              type={type}
              value={value}
              onChange={e => onChange((e.target as HTMLInputElement).value)} />
+    </label>
+  );
+}
+
+function Textarea({ label, value, onChange } : { label: string, value: any, onChange: (v: string)=>void }) {
+  return (
+    <label className="md:col-span-2 grid gap-1.5">
+      <span className="text-sm font-medium">{label}</span>
+      <textarea className="rounded-xl border px-3 py-2 outline-none focus:ring-2 focus:ring-gray-200 min-h-[80px]"
+                value={value}
+                onChange={e => onChange((e.target as HTMLTextAreaElement).value)} />
     </label>
   );
 }
