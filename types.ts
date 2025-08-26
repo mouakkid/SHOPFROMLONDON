@@ -6,6 +6,8 @@ export type Order = {
   address: string;
   phone: string;
   instagram_url: string | null;
+  product_name: string | null;
+  comment: string | null;
   amount_purchase: number | null;
   amount_sale: number | null;
   amount_deposit: number | null;
